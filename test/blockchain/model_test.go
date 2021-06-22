@@ -87,7 +87,7 @@ func TestSearchBlockInChainChainModel(t *testing.T) {
 		},
 	}
 
-	got := mockChain.Search("5fcb9413df11212039a1eddd613d475db3b8f50451246bf3e6cd056566ff13c4")
+	got, err := mockChain.Search("5fcb9413df11212039a1eddd613d475db3b8f50451246bf3e6cd056566ff13c4")
 	want := BlockChain{
 		Index:    2,
 		Body:     "Testt2",
@@ -95,7 +95,7 @@ func TestSearchBlockInChainChainModel(t *testing.T) {
 		Hash:     "5fcb9413df11212039a1eddd613d475db3b8f50451246bf3e6cd056566ff13c4",
 	}
 
-	if !reflect.DeepEqual(want, got) {
+	if !reflect.DeepEqual(want, got) || err != nil {
 		t.Fatalf("expected: %v, got: %v", want, got)
 	}
 }

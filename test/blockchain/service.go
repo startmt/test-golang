@@ -3,6 +3,7 @@ package blockchain
 import (
 	"crypto/sha256"
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -19,12 +20,12 @@ func AddOneChain(block BlockChain) BlockChain {
 	return block
 }
 
-func SearchBlockChain(array []BlockChain, hash string) BlockChain {
+func SearchBlockChain(array []BlockChain, hash string) (BlockChain, error) {
 	for i := 0; i < len(array); i++ {
 		if array[i].Hash == hash {
-			return array[i]
+			return array[i], nil
 		}
 	}
-	return BlockChain{}
+	return BlockChain{}, errors.New("notfound")
 
 }

@@ -56,7 +56,7 @@ func TestSearchChain(t *testing.T) {
 		},
 	}
 
-	got := mockChain.Search("5fcb9413df11212039a1eddd613d475db3b8f50451246bf3e6cd056566ff13c4")
+	got, err := mockChain.Search("5fcb9413df11212039a1eddd613d475db3b8f50451246bf3e6cd056566ff13c4")
 
 	want := BlockChain{
 		Index:    2,
@@ -65,7 +65,7 @@ func TestSearchChain(t *testing.T) {
 		Hash:     "5fcb9413df11212039a1eddd613d475db3b8f50451246bf3e6cd056566ff13c4",
 	}
 
-	if !reflect.DeepEqual(want, got) {
+	if !reflect.DeepEqual(want, got) || err != nil {
 		t.Fatalf("expected: %v, got: %v", want, got)
 	}
 }
@@ -93,9 +93,9 @@ func TestSearchBlockChainNotFound(t *testing.T) {
 		},
 	}
 
-	got := SearchBlockChain(mockData, "notfoundthishash")
-	want := BlockChain{}
-	if !reflect.DeepEqual(want, got) {
-		t.Fatalf("expected: %v, got: %v", want, got)
+	_, err := SearchBlockChain(mockData, "notfoundthishash")
+	want := "notfound"
+	if !reflect.DeepEqual(want, err.Error()) || err == nil {
+		t.Fatalf("expected: %v, error: %v", want, err)
 	}
 }

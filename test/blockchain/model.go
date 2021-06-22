@@ -21,7 +21,7 @@ type ChainArray []BlockChain
 
 var chain = ChainArray{}
 
-func (arr *ChainArray) Search(hash string) BlockChain {
+func (arr *ChainArray) Search(hash string) (BlockChain, error) {
 	return SearchBlockChain(*arr, hash)
 }
 

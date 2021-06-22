@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"example.com/test/constant"
 )
 
 func GetBlockChainArrayController(h http.ResponseWriter, req http.Request) {
@@ -12,9 +15,26 @@ func GetBlockChainArrayController(h http.ResponseWriter, req http.Request) {
 }
 
 func GetBlockChainByHashController(h http.ResponseWriter, req http.Request) {
-	strPath := strings.Split(req.URL.Path, "/")
-	data := chain.Search(strPath[2])
+	strPath := strings.Split(strings.Trim(req.URL.Path, "/"), "/")
+	data, err := chain.Search(strPath[2])
+	if err != nil {
+		errorResponse := constant.ErrorResponse{Status: 404, Meesage: "Not found."}
+		json.NewEncoder(h).Encode(errorResponse)
+		return
+	}
 	json.NewEncoder(h).Encode(data)
+
+}
+
+func GetBlockChainByIndexController(h http.ResponseWriter, req http.Request) {
+	strPath := strings.Split(strings.Trim(req.URL.Path, "/"), "/")
+	index, err := strconv.Atoi(strPath[2])
+	if err != nil {
+		errorResponse := constant.ErrorResponse{Status: 404, Meesage: "Not found."}
+		json.NewEncoder(h).Encode(errorResponse)
+		return
+	}
+	json.NewEncoder(h).Encode(chain[index])
 
 }
 
@@ -34,11 +54,11 @@ func AddBlockChainController(h http.ResponseWriter, req http.Request) {
 
 	bodyStruct := CreateBlockChainReq{Body: string(reqBody.Body)}
 	serviceParam := BlockChain{
-		Index: len(chain) - 1,
+		Index: len(chain),
 		Body:  bodyStruct.Body,
 	}
-	if len(chain) > 1 {
-		serviceParam.PrevHash = chain[len(chain)-1].PrevHash
+	if len(chain) > 0 {
+		serviceParam.PrevHash = chain[len(chain)-1].Hash
 	}
 	newBlock := AddOneChain(serviceParam)
 
