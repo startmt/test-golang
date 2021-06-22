@@ -29,7 +29,7 @@ func GetBlockChainByHashController(h http.ResponseWriter, req http.Request) {
 func GetBlockChainByIndexController(h http.ResponseWriter, req http.Request) {
 	strPath := strings.Split(strings.Trim(req.URL.Path, "/"), "/")
 	index, err := strconv.Atoi(strPath[2])
-	if err != nil {
+	if err != nil || len(chain) == 0 || index >= len(chain) {
 		errorResponse := constant.ErrorResponse{Status: 404, Meesage: "Not found."}
 		json.NewEncoder(h).Encode(errorResponse)
 		return
