@@ -100,15 +100,15 @@ func TestSearchBlockInChainChainModel(t *testing.T) {
 	}
 }
 
-// CreateBlockChainReq
+// CreateBlockChainRequest
 
-func TestCreateBlockChainReq(t *testing.T) {
+func TestCreateBlockChainRequest(t *testing.T) {
 	mockBody := "Test123123"
-	req := CreateBlockChainReq{}
+	req := CreateBlockChainRequest{}
 	req.Create(mockBody)
 
 	got := req
-	want := CreateBlockChainReq{Body: mockBody}
+	want := CreateBlockChainRequest{Body: mockBody}
 
 	if !reflect.DeepEqual(want, got) {
 		t.Fatalf("expected: %v, got: %v", want, got)

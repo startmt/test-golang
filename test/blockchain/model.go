@@ -29,11 +29,3 @@ func (arr *ChainArray) Add(b BlockChain) {
 	newChain := append(*arr, b)
 	*arr = newChain
 }
-
-type CreateBlockChainReq struct {
-	Body string `json:"body"`
-}
-
-func (req *CreateBlockChainReq) Create(body string) {
-	req.Body = body
-}

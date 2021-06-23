@@ -10,11 +10,11 @@ import (
 	"example.com/test/constant"
 )
 
-func GetBlockChainArrayController(h http.ResponseWriter, req http.Request) {
+func GetBlockChainArrayController(h http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(h).Encode(chain)
 }
 
-func GetBlockChainByHashController(h http.ResponseWriter, req http.Request) {
+func GetBlockChainByHashController(h http.ResponseWriter, req *http.Request) {
 	strPath := strings.Split(strings.Trim(req.URL.Path, "/"), "/")
 	data, err := chain.Search(strPath[2])
 	if err != nil {
@@ -26,7 +26,7 @@ func GetBlockChainByHashController(h http.ResponseWriter, req http.Request) {
 
 }
 
-func GetBlockChainByIndexController(h http.ResponseWriter, req http.Request) {
+func GetBlockChainByIndexController(h http.ResponseWriter, req *http.Request) {
 	strPath := strings.Split(strings.Trim(req.URL.Path, "/"), "/")
 	index, err := strconv.Atoi(strPath[2])
 	if err != nil || len(chain) == 0 || index >= len(chain) {
@@ -38,21 +38,26 @@ func GetBlockChainByIndexController(h http.ResponseWriter, req http.Request) {
 
 }
 
-func AddBlockChainController(h http.ResponseWriter, req http.Request) {
+func ValidateBlockChainController(h http.ResponseWriter, req *http.Request) {
+
+	isBlockValidate := ValidateBlockChain(chain)
+
+	response := ValidateBlockChainResponse{IsValidate: isBlockValidate}
+
+	json.NewEncoder(h).Encode(response)
+
+}
+
+func AddBlockChainController(h http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 
 	if err != nil {
 		http.Error(h, err.Error(), http.StatusBadRequest)
 		return
 	}
-	var reqBody CreateBlockChainReq
-	err = json.Unmarshal(body, &reqBody)
-	if err != nil {
-		http.Error(h, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	bodyStruct := CreateBlockChainReq{Body: string(reqBody.Body)}
+	var reqBody CreateBlockChainRequest
+	UnMarshal(h, body, &reqBody)
+	bodyStruct := CreateBlockChainRequest{Body: string(reqBody.Body)}
 	serviceParam := BlockChain{
 		Index: len(chain),
 		Body:  bodyStruct.Body,

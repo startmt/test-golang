@@ -1,50 +1,51 @@
 package blockchain
 
 import (
+	"fmt"
 	"net/http"
-	"strings"
 
 	"example.com/test/constant"
 )
 
-func HandlerBlockChainPath(h http.ResponseWriter, req *http.Request) {
-	h.Header().Set("content-type", "application/json")
-	method := req.Method
+type Router struct{}
 
-	switch method {
-	case constant.GET:
-		GetMethod(h, *req)
-		return
-	case constant.POST:
-		PostMethod(h, *req)
-		return
-	}
-}
-
-func GetMethod(h http.ResponseWriter, req http.Request) {
-	strPath := strings.Split(strings.Trim(req.URL.Path, "/"), "/")
-	if len(strPath) >= 2 {
-		switch strPath[1] {
-		case "hash":
-			GetBlockChainByHashController(h, req)
-		case "index":
-			GetBlockChainByIndexController(h, req)
-		default:
-			http.Error(h, "", http.StatusNotFound)
+func (r *Router) Get(path string, handler http.HandlerFunc) {
+	http.HandleFunc(path, func(w http.ResponseWriter, req *http.Request) {
+		if req.Method == constant.GET {
+			handler(w, req)
+		} else {
+			http.Error(w, "methodnotallow", http.StatusMethodNotAllowed)
 		}
 
-	} else {
-		GetBlockChainArrayController(h, req)
-	}
+	})
 
 }
 
-func PostMethod(h http.ResponseWriter, req http.Request) {
-	AddBlockChainController(h, req)
+func (r *Router) Post(path string, handler http.HandlerFunc) {
+
+	http.HandleFunc(path, func(w http.ResponseWriter, req *http.Request) {
+
+		if req.Method == constant.POST {
+			handler(w, req)
+		} else {
+			http.Error(w, "methodnotallow", http.StatusMethodNotAllowed)
+		}
+
+	})
+
 }
 
-func MainRoute(handleFunc func(pattern string, handler func(h http.ResponseWriter, req *http.Request))) {
-	handleFunc("/blockchain/", HandlerBlockChainPath)
-	handleFunc("/blockchain/hash", HandlerBlockChainPath)
-	handleFunc("/blockchain/index", HandlerBlockChainPath)
+func (r *Router) CreateServer(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	fmt.Println(req.Method, req.URL.Path)
+	Server := http.DefaultServeMux
+	Server.ServeHTTP(w, req)
+}
+
+func MainRoute(router Router) {
+	router.Get("/blockchain/", GetBlockChainArrayController)
+	router.Post("/blockchain/add", AddBlockChainController)
+	router.Get("/blockchain/hash/", GetBlockChainByHashController)
+	router.Get("/blockchain/index/", GetBlockChainByIndexController)
+	router.Post("/blockchain/validate", ValidateBlockChainController)
 }
