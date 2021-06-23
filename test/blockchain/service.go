@@ -17,8 +17,8 @@ func CreateNewHash(b BlockChain) string {
 }
 
 func NewBlockBy(block BlockChain) BlockChain {
-	block.MakeBlockWithNewHash(block)
-	return block
+	newBlock := block.MakeBlockWithNewHash(block)
+	return newBlock
 }
 
 func SearchBlockChain(array []BlockChain, hash string) (BlockChain, error) {

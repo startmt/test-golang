@@ -3,5 +3,5 @@ package blockchain
 import "errors"
 
 var (
-	ErrNotFound = errors.New("not found")
+	ErrorNotFound = errors.New("not found")
 )

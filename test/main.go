@@ -1,9 +1,8 @@
 package main
 
 import (
+	"github.com/startmt/test-golang/test/blockchain"
 	"net/http"
-
-	"example.com/test/blockchain"
 )
 
 func main() {
@@ -11,5 +10,5 @@ func main() {
 
 	blockchain.MainRoute(router)
 
-	http.ListenAndServe(":8080", http.HandlerFunc(router.CreateServer))
+	http.ListenAndServe(":8080", http.HandlerFunc(router.Handler))
 }

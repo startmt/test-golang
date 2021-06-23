@@ -5,5 +5,5 @@ func MainRoute(router Router) {
 	router.Post("/blockchain/add", AddBlockChainController)
 	router.Get("/blockchain/hash/", GetBlockChainByHashController)
 	router.Get("/blockchain/index/", GetBlockChainByIndexController)
-	router.Post("/blockchain/validate", ValidateBlockChainController)
+	//router.Post("/blockchain/validate", ValidateBlockChainController)
 }

@@ -7,22 +7,41 @@ type BlockChain struct {
 	Hash     string `json:"hash"`
 }
 
-func (p *BlockChain) MakeBlockWithNewHash(block BlockChain) {
-	p.Body = block.Body
-	p.Index = block.Index
-	p.PrevHash = block.PrevHash
-	p.Hash = CreateNewHash(*p)
+func (p *BlockChain) MakeBlockWithNewHash(block BlockChain) BlockChain{
+	newBlock := BlockChain{
+		Index: block.Index,
+		Body: block.Body,
+		PrevHash: block.PrevHash,
+	}
+
+	return BlockChain{
+		Index: newBlock.Index,
+		Body: newBlock.Body,
+		Hash: CreateNewHash(newBlock),
+		PrevHash: newBlock.PrevHash,
+	}
 }
-
 type ChainArray []BlockChain
-
 var chain = ChainArray{}
 
-func (arr *ChainArray) Search(hash string) (BlockChain, error) {
-	return SearchBlockChain(*arr, hash)
+func (chain ChainArray) SearchBlockChainBy(fn func(blockChain BlockChain) bool) (BlockChain, error) {
+	for _,block := range chain {
+		if fn(block) {
+			return block, nil
+		}
+	}
+	return BlockChain{}, ErrorNotFound
 }
 
-func (arr *ChainArray) Add(b BlockChain) {
-	newChain := append(*arr, b)
-	*arr = newChain
+
+func IsSameHash(hash string) func(blockChain BlockChain) bool {
+	return func(blockChain BlockChain) bool{
+		return blockChain.Hash == hash
+	}
+}
+
+func IsSameIndex(index int) func(blockChain BlockChain) bool {
+	return func(blockChain BlockChain) bool{
+		return blockChain.Index == index
+	}
 }
