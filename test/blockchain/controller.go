@@ -10,14 +10,14 @@ import (
 	"strings"
 )
 
-func GetBlockChainArrayController(h http.ResponseWriter, req *http.Request) {
+func GetBlockChainArrayController(h http.ResponseWriter, _ *http.Request) {
 	json.NewEncoder(h).Encode(chain)
 }
 
 func GetBlockChainByHashController(h http.ResponseWriter, req *http.Request) {
 	strPath := strings.Split(strings.Trim(req.URL.Path, "/"), "/")
 
-	searchChain, err := chain.SearchBlockChainBy(IsSameHash(strPath[2]))
+	searchChain, err := SearchBlockChainBy(IsSameHash(strPath[2]))(chain)
 	if err != nil {
 		if errors.Is(err, ErrorNotFound) {
 			errorResponse := constant.ErrorResponse{Status: 404, Meesage: "Not found."}
@@ -39,7 +39,7 @@ func GetBlockChainByIndexController(h http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	searchChain, err := chain.SearchBlockChainBy(IsSameIndex(index))
+	searchChain, err := SearchBlockChainBy(IsSameIndex(index))(chain)
 	if err != nil {
 		if errors.Is(err, ErrorNotFound) {
 			errorResponse := constant.ErrorResponse{Status: 404, Meesage: "Not found."}
@@ -77,10 +77,10 @@ func AddBlockChainController(h http.ResponseWriter, req *http.Request) {
 }
 
 
-//func ValidateBlockChainController(h http.ResponseWriter, req *http.Request) {
-//	isBlockValidate := ValidateBlockChain(chain)
-//
-//	response := ValidateBlockChainResponse{IsValidate: isBlockValidate}
-//
-//	json.NewEncoder(h).Encode(response)
-//}
+func ValidateBlockChainController(h http.ResponseWriter, _ *http.Request) {
+	isBlockValidate := ValidateBlockChain(chain)
+
+	response := ValidateBlockChainResponse{IsValidate: isBlockValidate}
+
+	json.NewEncoder(h).Encode(response)
+}
