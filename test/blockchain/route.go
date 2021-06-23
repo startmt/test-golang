@@ -2,9 +2,9 @@ package blockchain
 
 import (
 	"fmt"
+	"github.com/startmt/test-golang/test/constant"
 	"net/http"
 
-	"example.com/test/constant"
 )
 
 type Router struct{}
@@ -32,7 +32,7 @@ func (r *Router) Post(path string, handler http.HandlerFunc) {
 	})
 }
 
-func (r *Router) CreateServer(w http.ResponseWriter, req *http.Request) {
+func (r *Router) Handler(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	fmt.Println(req.Method, req.URL.Path)
 	Server := http.DefaultServeMux
