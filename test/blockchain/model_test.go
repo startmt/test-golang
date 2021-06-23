@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-//BlockChain Model
+// BlockChain Model
 func TestAddBlockModel(t *testing.T) {
 	block := BlockChain{}
 	block.MakeBlockWithNewHash(BlockChain{

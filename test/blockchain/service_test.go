@@ -21,7 +21,7 @@ func TestAddFirstChain(t *testing.T) {
 		Index: 0,
 		Body:  "TestData",
 	}
-	got := AddOneChain(mockData)
+	got := NewBlockBy(mockData)
 	want := BlockChain{
 		Index:    0,
 		Body:     "TestData",
@@ -127,6 +127,49 @@ func TestSearchBlockChainByPrevHashNotFound(t *testing.T) {
 	want := "notfound"
 	if !reflect.DeepEqual(want, err.Error()) || err == nil {
 		t.Fatalf("expected: %v, error: %v", want, err)
+	}
+}
+
+func TestValidateBlockChain(t *testing.T) {
+	tableTest := map[string]struct{
+		input []BlockChain
+		want bool
+	}{
+		"Test Prev Hash InValid": {
+			input: []BlockChain{
+				{
+					Index: 0,
+					Body:  "Body1",
+					Hash:  "aef9d52a83cc29df3c8a56192f11bf49a6c7a86c647579920ae26de7092bfc2c",
+				},
+				{
+					Index:    1,
+					Body:     "Body2",
+					Hash:     "0b1c825c98f782f26dde3292b3116fbf734e00c3b3d23a1dc548e5e18db1c453",
+					PrevHash: "aef9d52a83cc29df3c8a56192f11bf49a6c7a86c647579920ae26de7092bfc2a", // true prev hash lastchar is c
+				},
+				{
+					Index:    2,
+					Body:     "Body2",
+					Hash:     "8126b51c590a3f25a2350409a582a1ffca58f987e25fb236e44c994ec04fe6f6",
+					PrevHash: "0b1c825c98f782f26dde3292b3116fbf734e00c3b3d23a1dc548e5e18db1c453",
+				},
+				{
+					Index:    3,
+					Body:     "Body2",
+					Hash:     "915b6e1399e83c0cc7b962cfb6db6db5a274efe595f56a36e9829f09bf686a18",
+					PrevHash: "8126b51c590a3f25a2350409a582a1ffca58f987e25fb236e44c994ec04fe6f6",
+				},
+			},
+			want: false,
+		},
+	}
+
+	for name, testcase := range tableTest {
+		got := ValidateBlockChain(testcase.input)
+		if !reflect.DeepEqual(got, testcase.want) {
+			t.Fatalf("case: %s expected: %v, got: %v", name, testcase.want, got)
+		}
 	}
 }
 

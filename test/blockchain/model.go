@@ -11,10 +11,7 @@ func (p *BlockChain) MakeBlockWithNewHash(block BlockChain) {
 	p.Body = block.Body
 	p.Index = block.Index
 	p.PrevHash = block.PrevHash
-	newHash := CreateNewHash(*p)
-
-	p.Hash = newHash
-
+	p.Hash = CreateNewHash(*p)
 }
 
 type ChainArray []BlockChain

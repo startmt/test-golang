@@ -16,7 +16,7 @@ func CreateNewHash(b BlockChain) string {
 
 }
 
-func AddOneChain(block BlockChain) BlockChain {
+func NewBlockBy(block BlockChain) BlockChain {
 	block.MakeBlockWithNewHash(block)
 	return block
 }
@@ -27,8 +27,8 @@ func SearchBlockChain(array []BlockChain, hash string) (BlockChain, error) {
 			return array[i], nil
 		}
 	}
-	return BlockChain{}, errors.New("notfound")
 
+	return BlockChain{}, errors.New("notfound")
 }
 
 func SearchBlockChainByPrevHash(array []BlockChain, prevHash string) (BlockChain, error) {
@@ -37,8 +37,8 @@ func SearchBlockChainByPrevHash(array []BlockChain, prevHash string) (BlockChain
 			return array[i], nil
 		}
 	}
-	return BlockChain{}, errors.New("notfound")
 
+	return BlockChain{}, errors.New("notfound")
 }
 
 func ValidateBlockChain(blockChain []BlockChain) bool {
@@ -58,10 +58,12 @@ func ValidateBlockChain(blockChain []BlockChain) bool {
 		if !reflect.DeepEqual(block.Hash, blockChain[i].Hash) {
 			return false
 		}
+
 		_, err := SearchBlockChainByPrevHash(blockChain[i+1:], newHash)
 		if err != nil {
 			return false
 		}
+
 		currentBlock = block
 	}
 

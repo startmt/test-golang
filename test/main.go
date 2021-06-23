@@ -8,7 +8,8 @@ import (
 
 func main() {
 	router := blockchain.Router{}
-	blockchain.MainRoute(router)
-	http.ListenAndServe(":8080", http.HandlerFunc(router.CreateServer))
 
+	blockchain.MainRoute(router)
+
+	http.ListenAndServe(":8080", http.HandlerFunc(router.CreateServer))
 }

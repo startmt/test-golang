@@ -1,4 +1,6 @@
 package constant
 
-const GET = "GET"
-const POST = "POST"
+const (
+	GET  = "GET"
+	POST = "POST"
+)
