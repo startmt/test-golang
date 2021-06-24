@@ -96,10 +96,10 @@ func TestValidateBlockChain(t *testing.T) {
 			expected: false,
 		},
 	}
-	for testName,testCaseData := range tableTest {
+	for testCase,testCaseData := range tableTest {
 		got := ValidateBlockChain(testCaseData.input)
 		if !reflect.DeepEqual(testCaseData.expected, got) {
-			t.Fatalf("case %s is \n expected: \n %v\n got:\n%v", testName, testCaseData.expected, got)
+			t.Fatalf("case %s is \n expected: \n %v\n got:\n%v", testCase, testCaseData.expected, got)
 		}
 	}
 }
