@@ -16,7 +16,6 @@ func (r *Router) Get(path string, handler http.HandlerFunc) {
 		} else {
 			http.Error(w, "methodnotallow", http.StatusMethodNotAllowed)
 		}
-
 	})
 }
 
@@ -26,7 +25,6 @@ func (r *Router) Post(path string, handler http.HandlerFunc) {
 			handler(w, req)
 			return
 		}
-
 		http.Error(w, "methodnotallow", http.StatusMethodNotAllowed)
 		return
 	})
