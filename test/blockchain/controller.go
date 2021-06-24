@@ -3,11 +3,12 @@ package blockchain
 import (
 	"encoding/json"
 	"errors"
-	"github.com/startmt/test-golang/test/constant"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
+
+	. "github.com/startmt/test-golang/test/constant"
 )
 
 func GetBlockChainArrayController(h http.ResponseWriter, _ *http.Request) {
@@ -20,12 +21,12 @@ func GetBlockChainByHashController(h http.ResponseWriter, req *http.Request) {
 	searchChain, err := SearchBlockChainBy(IsSameHash(strPath[2]))(chain)
 	if err != nil {
 		if errors.Is(err, ErrorNotFound) {
-			errorResponse := constant.ErrorResponse{Status: 404, Meesage: "Not found."}
+			errorResponse := ErrorResponse{Status: 404, Meesage: "Not found."}
 			json.NewEncoder(h).Encode(errorResponse)
 			return
 		}
-			errorResponse := constant.ErrorResponse{Status: 400, Meesage: err.Error()}
-			json.NewEncoder(h).Encode(errorResponse)
+		errorResponse := ErrorResponse{Status: 400, Meesage: err.Error()}
+		json.NewEncoder(h).Encode(errorResponse)
 	}
 	json.NewEncoder(h).Encode(searchChain)
 }
@@ -34,7 +35,7 @@ func GetBlockChainByIndexController(h http.ResponseWriter, req *http.Request) {
 	strPath := strings.Split(strings.Trim(req.URL.Path, "/"), "/")
 	index, err := strconv.Atoi(strPath[2])
 	if err != nil || len(chain) == 0 || index >= len(chain) {
-		errorResponse := constant.ErrorResponse{Status: 404, Meesage: "Not found."}
+		errorResponse := ErrorResponse{Status: 404, Meesage: "Not found."}
 		json.NewEncoder(h).Encode(errorResponse)
 		return
 	}
@@ -42,16 +43,15 @@ func GetBlockChainByIndexController(h http.ResponseWriter, req *http.Request) {
 	searchChain, err := SearchBlockChainBy(IsSameIndex(index))(chain)
 	if err != nil {
 		if errors.Is(err, ErrorNotFound) {
-			errorResponse := constant.ErrorResponse{Status: 404, Meesage: "Not found."}
+			errorResponse := ErrorResponse{Status: 404, Meesage: "Not found."}
 			json.NewEncoder(h).Encode(errorResponse)
 			return
 		}
-		errorResponse := constant.ErrorResponse{Status: 400, Meesage: err.Error()}
+		errorResponse := ErrorResponse{Status: 400, Meesage: err.Error()}
 		json.NewEncoder(h).Encode(errorResponse)
 	}
 	json.NewEncoder(h).Encode(searchChain)
 }
-
 
 func AddBlockChainController(h http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
@@ -73,9 +73,8 @@ func AddBlockChainController(h http.ResponseWriter, req *http.Request) {
 	if len(chain) > 0 {
 		serviceParam.PrevHash = chain[len(chain)-1].Hash
 	}
-	chain = append(chain,NewBlockBy(serviceParam))
+	chain = append(chain, NewBlockBy(serviceParam))
 }
-
 
 func ValidateBlockChainController(h http.ResponseWriter, _ *http.Request) {
 	isBlockValidate := ValidateBlockChain(chain)

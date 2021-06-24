@@ -1,6 +1,6 @@
 package blockchain
 
-func SearchBlockChainBy(fn func(blockChain BlockChain) bool) func(blockChainSlice []BlockChain) (BlockChain, error) {
+func SearchBlockChainBy(fn func(BlockChain) bool) func(blockChainSlice []BlockChain) (BlockChain, error) {
 	return func(blockChainSlice []BlockChain) (BlockChain, error) {
 		for _,block := range blockChainSlice {
 			if fn(block) {

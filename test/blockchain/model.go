@@ -6,6 +6,3 @@ type BlockChain struct {
 	PrevHash string `json:"prevHash"`
 	Hash     string `json:"hash"`
 }
-
-
-

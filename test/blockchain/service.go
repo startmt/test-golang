@@ -31,14 +31,14 @@ func NewBlockBy(block BlockChain) BlockChain {
 
 
 func ValidateBlockChain(blockChain []BlockChain) bool {
-	for i := 0; i < len(blockChain); i++ {
+	for _, b := range blockChain {
 		block := BlockChain{
-			Index:    blockChain[i].Index,
-			Body:     blockChain[i].Body,
-			PrevHash: blockChain[i].PrevHash,
+			Index:    b.Index,
+			Body:     b.Body,
+			PrevHash: b.PrevHash,
 		}
 		newHash := CreateNewHash(block)
-		if !reflect.DeepEqual(newHash, blockChain[i].Hash) {
+		if !reflect.DeepEqual(newHash, b.Hash) {
 			return false
 		}
 	}
