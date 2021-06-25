@@ -16,19 +16,22 @@ func CreateNewHash(b BlockChain) string {
 }
 
 func NewBlockBy(block BlockChain) BlockChain {
-		newBlock := BlockChain{
-			Index: block.Index,
-			Body: block.Body,
-			PrevHash: block.PrevHash,
-		}
-		return BlockChain{
-			Index: newBlock.Index,
-			Body: newBlock.Body,
-			Hash: CreateNewHash(newBlock),
-			PrevHash: newBlock.PrevHash,
+	newBlock := BlockChain{
+		Index:    block.Index,
+		Body:     block.Body,
+		PrevHash: block.PrevHash,
+	}
+	return BlockChain{
+		Index:    newBlock.Index,
+		Body:     newBlock.Body,
+		Hash:     CreateNewHash(newBlock),
+		PrevHash: newBlock.PrevHash,
 	}
 }
 
+func AppendBlockInDatabase(collection Collection, block BlockChain) error {
+	return InsertBlockChainOne(collection, block)
+}
 
 func ValidateBlockChain(blockChain []BlockChain) bool {
 	for _, b := range blockChain {
@@ -43,4 +46,14 @@ func ValidateBlockChain(blockChain []BlockChain) bool {
 		}
 	}
 	return true
+}
+
+func GetAllBlockChain(collection Collection) ([]BlockChain, error) {
+	return QueryBlockChain(collection)
+}
+
+func GetBlockChainBy(fn func(collection Collection) (BlockChain, error)) func(Collection) (BlockChain, error) {
+	return func(collection Collection) (BlockChain, error) {
+		return fn(collection)
+	}
 }

@@ -1,8 +1,8 @@
 package blockchain
 
 type BlockChain struct {
-	Index    int    `json:"index"`
-	Body     string `json:"body"`
-	PrevHash string `json:"prevHash"`
-	Hash     string `json:"hash"`
+	Index    int    `bson:"index" json:"index"`
+	Body     string `bson:"body" json:"body"`
+	PrevHash string `bson:"prev_hash" json:"prevHash"`
+	Hash     string `bson:"hash" json:"hash"`
 }

@@ -1,41 +1,13 @@
 package blockchain
 
 import (
-	"fmt"
-	"net/http"
-
-	"github.com/startmt/test-golang/test/constant"
+	"github.com/gofiber/fiber/v2"
 )
 
-type Router struct{}
-
-// Get Point: -1
-func (r *Router) Get(path string, handler http.HandlerFunc) {
-	http.HandleFunc(path, func(w http.ResponseWriter, req *http.Request) {
-		if req.Method == constant.GET {
-			handler(w, req)
-		} else {
-			http.Error(w, "method not allow", http.StatusMethodNotAllowed)
-		}
-	})
-}
-
-func (r *Router) Post(path string, handler http.HandlerFunc) {
-	http.HandleFunc(path, func(w http.ResponseWriter, req *http.Request) {
-		if req.Method == constant.POST {
-			handler(w, req)
-			return
-		}
-		http.Error(w, "method not allow", http.StatusMethodNotAllowed)
-		return
-	})
-}
-
-func (r *Router) Handler(w http.ResponseWriter, req *http.Request) {
-	w.Header().Set("content-type", "application/json")
-
-	fmt.Println(req.Method, req.URL.Path)
-
-	Server := http.DefaultServeMux
-	Server.ServeHTTP(w, req)
+func Route(router fiber.Router, repository Collection) {
+	router.Get("/blockchain", InjectBlockchainRepositoryIntoController(repository, GetBlockChainArrayController))
+	router.Get("/blockchain/hash/:id", InjectBlockchainRepositoryIntoController(repository, GetBlockChainByHashController))
+	router.Get("/blockchain/index/:id", InjectBlockchainRepositoryIntoController(repository, GetBlockChainByIndexController))
+	router.Get("/blockchain/validate", InjectBlockchainRepositoryIntoController(repository, ValidateBlockChainController))
+	router.Post("/blockchain", InjectBlockchainRepositoryIntoController(repository, AddBlockChainController))
 }
