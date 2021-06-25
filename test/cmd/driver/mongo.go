@@ -28,7 +28,6 @@ var (
 
 func ConnectMongo() (*MongoResource, error) {
 	mongoConnectString := fmt.Sprintf("mongodb://%s:%s@%s", username, password, endpoint)
-	fmt.Println(mongoConnectString)
 	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoConnectString))
