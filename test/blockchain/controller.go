@@ -16,7 +16,7 @@ func GetBlockChainArrayController(c *fiber.Ctx, repository Collection) error {
 }
 
 func GetBlockChainByHashController(c *fiber.Ctx, repository Collection) error {
-	searchChain, err := GetBlockChainBy(QueryOneBlockChainByHash(c.Params("id")))(repository)
+	searchChain, err := GetBlockChainBy(QueryOneBlockChainByHash(c.Params("hash")))(repository)
 	if err != nil {
 		if errors.Is(err, ErrorNotFound) {
 			return c.SendStatus(404)
@@ -27,7 +27,7 @@ func GetBlockChainByHashController(c *fiber.Ctx, repository Collection) error {
 }
 
 func GetBlockChainByIndexController(c *fiber.Ctx, repository Collection) error {
-	index, err := strconv.Atoi(c.Params("id"))
+	index, err := strconv.Atoi(c.Params("index"))
 	if err != nil {
 		return c.SendStatus(404)
 	}
