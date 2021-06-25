@@ -3,83 +3,80 @@ package blockchain
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
-	"net/http"
+	"github.com/gofiber/fiber/v2"
 	"strconv"
-	"strings"
-
-	. "github.com/startmt/test-golang/test/constant"
 )
 
-func GetBlockChainArrayController(h http.ResponseWriter, _ *http.Request) {
-	json.NewEncoder(h).Encode(chain)
+func GetBlockChainArrayController(c *fiber.Ctx, repository Collection) error {
+	blocks, err := GetAllBlockChain(repository)
+	if err != nil {
+		return c.SendStatus(400)
+	}
+	return c.JSON(blocks)
 }
 
-func GetBlockChainByHashController(h http.ResponseWriter, req *http.Request) {
-	strPath := strings.Split(strings.Trim(req.URL.Path, "/"), "/")
-
-	searchChain, err := SearchBlockChainBy(IsSameHash(strPath[2]))(chain)
+func GetBlockChainByHashController(c *fiber.Ctx, repository Collection) error {
+	searchChain, err := GetBlockChainBy(QueryOneBlockChainByHash(c.Params("id")))(repository)
 	if err != nil {
 		if errors.Is(err, ErrorNotFound) {
-			errorResponse := ErrorResponse{Status: 404, Meesage: "Not found."}
-			json.NewEncoder(h).Encode(errorResponse)
-			return
+			return c.SendStatus(404)
 		}
-		errorResponse := ErrorResponse{Status: 400, Meesage: err.Error()}
-		json.NewEncoder(h).Encode(errorResponse)
+		return c.SendStatus(400)
 	}
-	json.NewEncoder(h).Encode(searchChain)
+	return c.JSON(searchChain)
 }
 
-func GetBlockChainByIndexController(h http.ResponseWriter, req *http.Request) {
-	strPath := strings.Split(strings.Trim(req.URL.Path, "/"), "/")
-	index, err := strconv.Atoi(strPath[2])
-	if err != nil || len(chain) == 0 || index >= len(chain) {
-		errorResponse := ErrorResponse{Status: 404, Meesage: "Not found."}
-		json.NewEncoder(h).Encode(errorResponse)
-		return
+func GetBlockChainByIndexController(c *fiber.Ctx, repository Collection) error {
+	index, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.SendStatus(404)
 	}
 
-	searchChain, err := SearchBlockChainBy(IsSameIndex(index))(chain)
+	searchChain, err := GetBlockChainBy(QueryOneBlockChainByIndex(index))(repository)
 	if err != nil {
 		if errors.Is(err, ErrorNotFound) {
-			errorResponse := ErrorResponse{Status: 404, Meesage: "Not found."}
-			json.NewEncoder(h).Encode(errorResponse)
-			return
+			return c.SendStatus(404)
 		}
-		errorResponse := ErrorResponse{Status: 400, Meesage: err.Error()}
-		json.NewEncoder(h).Encode(errorResponse)
+		return c.SendStatus(400)
 	}
-	json.NewEncoder(h).Encode(searchChain)
+	return c.JSON(searchChain)
 }
 
-func AddBlockChainController(h http.ResponseWriter, req *http.Request) {
-	body, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		http.Error(h, err.Error(), http.StatusBadRequest)
-		return
-	}
-
+func AddBlockChainController(c *fiber.Ctx, repository Collection) error {
 	var reqBody CreateBlockChainRequest
-	if err := json.Unmarshal(body, &reqBody); err != nil {
-		http.Error(h, err.Error(), http.StatusBadRequest)
-		return
+	if err := json.Unmarshal(c.Body(), &reqBody); err != nil {
+		return c.SendStatus(400)
+	}
+
+	blocks, err := GetAllBlockChain(repository)
+	if err != nil {
+		return c.SendStatus(400)
 	}
 
 	serviceParam := BlockChain{
-		Index: len(chain),
+		Index: len(blocks),
 		Body:  reqBody.Body,
 	}
-	if len(chain) > 0 {
-		serviceParam.PrevHash = chain[len(chain)-1].Hash
+	if len(blocks) > 0 {
+		serviceParam.PrevHash = blocks[len(blocks)-1].Hash
 	}
-	chain = append(chain, NewBlockBy(serviceParam))
+	newBlock := NewBlockBy(serviceParam)
+	err = AppendBlockInDatabase(repository, newBlock)
+	if err != nil {
+		return c.SendStatus(400)
+	}
+
+	return c.SendStatus(201)
 }
 
-func ValidateBlockChainController(h http.ResponseWriter, _ *http.Request) {
-	isBlockValidate := ValidateBlockChain(chain)
+func ValidateBlockChainController(c *fiber.Ctx, repository Collection) error {
+	blocks, err := GetAllBlockChain(repository)
+	if err != nil {
+		return c.SendStatus(400)
+	}
+	isBlockValidate := ValidateBlockChain(blocks)
 
 	response := ValidateBlockChainResponse{IsValidate: isBlockValidate}
 
-	json.NewEncoder(h).Encode(response)
+	return c.JSON(response)
 }
