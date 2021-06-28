@@ -3,8 +3,9 @@ package blockchain
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gofiber/fiber/v2"
 	"strconv"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 func GetBlockChainArrayController(c *fiber.Ctx, repository Collection) error {
@@ -48,19 +49,11 @@ func AddBlockChainController(c *fiber.Ctx, repository Collection) error {
 		return c.SendStatus(400)
 	}
 
-	blocks, err := GetAllBlockChain(repository)
+	newBlock, err := NewBlockByBody(repository, reqBody.Body)
 	if err != nil {
 		return c.SendStatus(400)
 	}
 
-	serviceParam := BlockChain{
-		Index: len(blocks),
-		Body:  reqBody.Body,
-	}
-	if len(blocks) > 0 {
-		serviceParam.PrevHash = blocks[len(blocks)-1].Hash
-	}
-	newBlock := NewBlockBy(serviceParam)
 	err = AppendBlockInDatabase(repository, newBlock)
 	if err != nil {
 		return c.SendStatus(400)

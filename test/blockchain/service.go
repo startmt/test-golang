@@ -15,18 +15,25 @@ func CreateNewHash(b BlockChain) string {
 
 }
 
-func NewBlockBy(block BlockChain) BlockChain {
+func NewBlockByBody(repository Collection, body string) (BlockChain, error) {
+	blocks, err := GetAllBlockChain(repository)
+	if err != nil {
+		return BlockChain{}, err
+	}
+
 	newBlock := BlockChain{
-		Index:    block.Index,
-		Body:     block.Body,
-		PrevHash: block.PrevHash,
+		Index: len(blocks),
+		Body:  body,
+	}
+	if len(blocks) > 0 {
+		newBlock.PrevHash = blocks[len(blocks)-1].Hash
 	}
 	return BlockChain{
 		Index:    newBlock.Index,
 		Body:     newBlock.Body,
 		Hash:     CreateNewHash(newBlock),
 		PrevHash: newBlock.PrevHash,
-	}
+	}, nil
 }
 
 func AppendBlockInDatabase(collection Collection, block BlockChain) error {
