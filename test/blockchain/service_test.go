@@ -21,7 +21,7 @@ func TestAddFirstChain(t *testing.T) {
 		Index: 0,
 		Body:  "TestData",
 	}
-	got := NewBlockBy(mockData)
+	got := NewBlockByBody(mockData)
 	expected := BlockChain{
 		Index:    0,
 		Body:     "TestData",
@@ -34,10 +34,36 @@ func TestAddFirstChain(t *testing.T) {
 	}
 }
 
+func TestAddPrevHashInBlock(t *testing.T) {
+	blocks := []BlockChain{{
+		Index:    0,
+		Body:     "TestData",
+		PrevHash: "",
+		Hash:     "62bd487b2bed54c776108dca6062ae71da1bf191dc8ab9c7abd6ac4f015c7674",
+	}}
+	mockData := BlockChain{
+		Index: 1,
+		Body:  "TestData1",
+	}
+
+	block := AddPrevHashInBlock(blocks, mockData)
+	got := NewBlockByBody(block)
+	expected := BlockChain{
+		Index:    1,
+		Body:     "TestData1",
+		PrevHash: "62bd487b2bed54c776108dca6062ae71da1bf191dc8ab9c7abd6ac4f015c7674",
+		Hash:     "4424aed2b48eb94a634f07303027c19d02426df4345ddf2212fcb926f29295b4",
+	}
+
+	if !reflect.DeepEqual(expected, got) {
+		t.Fatalf("expected: \n %v\n got:\n%v", expected, got)
+	}
+}
+
 func TestValidateBlockChain(t *testing.T) {
 	tableTest := map[string]struct {
-		input []BlockChain
-		expected  bool
+		input    []BlockChain
+		expected bool
 	}{
 		"Test Blockchain Valid": {
 			input: []BlockChain{
@@ -96,7 +122,7 @@ func TestValidateBlockChain(t *testing.T) {
 			expected: false,
 		},
 	}
-	for testCase,testCaseData := range tableTest {
+	for testCase, testCaseData := range tableTest {
 		got := ValidateBlockChain(testCaseData.input)
 		if !reflect.DeepEqual(testCaseData.expected, got) {
 			t.Fatalf("case %s is \n expected: \n %v\n got:\n%v", testCase, testCaseData.expected, got)

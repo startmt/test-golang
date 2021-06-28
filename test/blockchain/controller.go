@@ -49,11 +49,16 @@ func AddBlockChainController(c *fiber.Ctx, repository Collection) error {
 		return c.SendStatus(400)
 	}
 
-	newBlock, err := NewBlockByBody(repository, reqBody.Body)
+	blocks, err := GetAllBlockChain(repository)
 	if err != nil {
 		return c.SendStatus(400)
 	}
-
+	block := BlockChain{
+		Index: len(blocks),
+		Body:  reqBody.Body,
+	}
+	serviceParam := AddPrevHashInBlock(blocks, block)
+	newBlock := NewBlockByBody(serviceParam)
 	err = AppendBlockInDatabase(repository, newBlock)
 	if err != nil {
 		return c.SendStatus(400)
