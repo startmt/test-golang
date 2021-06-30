@@ -2,56 +2,46 @@ package blockchain
 
 import (
 	"encoding/json"
-	"errors"
-	"strconv"
 
-	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-func GetBlockChainArrayController(c *fiber.Ctx, repository Collection) error {
-	blocks, err := GetAllBlockChain(repository)
+func GetBlockChainArrayController(resource DefaultControllerResource) ([]BlockChain, error) {
+	blocks, err := QueryBlockChain(resource)
+
 	if err != nil {
-		return c.SendStatus(400)
+		return []BlockChain{}, err
 	}
-	return c.JSON(blocks)
+	return blocks, nil
 }
 
-func GetBlockChainByHashController(c *fiber.Ctx, repository Collection) error {
-	searchChain, err := GetBlockChainBy(QueryOneBlockChainByHash(c.Params("hash")))(repository)
+func GetBlockChainByHashController(resource DefaultControllerResource, hash string) (BlockChain, error) {
+	searchChain, err := GetBlockChainOneBy(bson.M{"hash": hash})(resource)
+
 	if err != nil {
-		if errors.Is(err, ErrorNotFound) {
-			return c.SendStatus(fiber.StatusNotFound)
-		}
-		return c.SendStatus(fiber.StatusBadRequest)
+		return BlockChain{}, err
 	}
-	return c.JSON(searchChain)
+	return searchChain, nil
 }
 
-func GetBlockChainByIndexController(c *fiber.Ctx, repository Collection) error {
-	index, err := strconv.Atoi(c.Params("index"))
-	if err != nil {
-		return c.SendStatus(404)
-	}
+func GetBlockChainByIndexController(resource DefaultControllerResource, index int) (BlockChain, error) {
+	searchChain, err := GetBlockChainOneBy(bson.M{"index": index})(resource)
 
-	searchChain, err := GetBlockChainBy(QueryOneBlockChainByIndex(index))(repository)
 	if err != nil {
-		if errors.Is(err, ErrorNotFound) {
-			return c.SendStatus(404)
-		}
-		return c.SendStatus(400)
+		return BlockChain{}, err
 	}
-	return c.JSON(searchChain)
+	return searchChain, nil
 }
 
-func AddBlockChainController(c *fiber.Ctx, repository Collection) error {
+func AddBlockChainController(resource DefaultControllerResource, body []byte) error {
 	var reqBody CreateBlockChainRequest
-	if err := json.Unmarshal(c.Body(), &reqBody); err != nil {
-		return c.SendStatus(400)
+	if err := json.Unmarshal(body, &reqBody); err != nil {
+		return err
 	}
 
-	blocks, err := GetAllBlockChain(repository)
+	blocks, err := QueryBlockChain(resource)
 	if err != nil {
-		return c.SendStatus(400)
+		return err
 	}
 
 	block := BlockChain{
@@ -62,21 +52,19 @@ func AddBlockChainController(c *fiber.Ctx, repository Collection) error {
 	serviceParam := AddPrevHashInBlock(blocks, block)
 	newBlock := NewBlockByBody(serviceParam)
 
-	if err = AppendBlockInDatabase(repository, newBlock); err != nil {
-		return c.SendStatus(400)
+	if err = InsertBlockChainOne(resource, newBlock); err != nil {
+		return err
 	}
 
-	return c.SendStatus(201)
+	return nil
 }
 
-func ValidateBlockChainController(c *fiber.Ctx, repository Collection) error {
-	blocks, err := GetAllBlockChain(repository)
+func ValidateBlockChainController(resource DefaultControllerResource) (ValidateBlockChainResponse, error) {
+	blocks, err := QueryBlockChain(resource)
 	if err != nil {
-		return c.SendStatus(400)
+		return ValidateBlockChainResponse{IsValidate: false}, err
 	}
 
 	isBlockValidate := ValidateBlockChain(blocks)
-	response := ValidateBlockChainResponse{IsValidate: isBlockValidate}
-
-	return c.Status(fiber.StatusOK).JSON(response)
+	return ValidateBlockChainResponse{IsValidate: isBlockValidate}, nil
 }

@@ -5,9 +5,9 @@ import (
 )
 
 func Route(router fiber.Router, repository Collection) {
-	router.Get("/blockchain", InjectBlockchainRepositoryIntoController(repository, GetBlockChainArrayController))
-	router.Get("/blockchain/hash/:hash", InjectBlockchainRepositoryIntoController(repository, GetBlockChainByHashController))
-	router.Get("/blockchain/index/:index", InjectBlockchainRepositoryIntoController(repository, GetBlockChainByIndexController))
-	router.Get("/blockchain/validate", InjectBlockchainRepositoryIntoController(repository, ValidateBlockChainController))
-	router.Post("/blockchain", InjectBlockchainRepositoryIntoController(repository, AddBlockChainController))
+	router.Get("/blockchain", InjectBlockchainRepositoryIntoController(repository, GeBlockChainView))
+	router.Get("/blockchain/hash/:hash", InjectBlockchainRepositoryIntoController(repository, GetBlockChainByHashView))
+	router.Get("/blockchain/index/:index", InjectBlockchainRepositoryIntoController(repository, GetBlockChainByIndex))
+	router.Get("/blockchain/validate", InjectBlockchainRepositoryIntoController(repository, ValidateBlockView))
+	router.Post("/blockchain", InjectBlockchainRepositoryIntoController(repository, AddBlockChainView))
 }

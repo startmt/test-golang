@@ -37,10 +37,6 @@ func NewBlockByBody(block BlockChain) BlockChain {
 	}
 }
 
-func AppendBlockInDatabase(collection Collection, block BlockChain) error {
-	return InsertBlockChainOne(collection, block)
-}
-
 func ValidateBlockChain(blockChain []BlockChain) bool {
 	for _, b := range blockChain {
 		block := BlockChain{
@@ -54,14 +50,4 @@ func ValidateBlockChain(blockChain []BlockChain) bool {
 		}
 	}
 	return true
-}
-
-func GetAllBlockChain(collection Collection) ([]BlockChain, error) {
-	return QueryBlockChain(collection)
-}
-
-func GetBlockChainBy(fn func(collection Collection) (BlockChain, error)) func(Collection) (BlockChain, error) {
-	return func(collection Collection) (BlockChain, error) {
-		return fn(collection)
-	}
 }
