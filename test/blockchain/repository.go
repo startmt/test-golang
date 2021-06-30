@@ -2,56 +2,52 @@ package blockchain
 
 import (
 	"context"
-	"github.com/startmt/test-golang/test/cmd/driver"
+
+	"github.com/startmt/test-golang/test/driver"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"time"
 )
 
 type Collection struct {
 	Blockchain *mongo.Collection
 }
 
-const (
-	connectTimeout = 20
-)
-
-func createContext() (context.Context, context.CancelFunc) {
-	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout*time.Second)
-	return ctx, cancel
-}
-
 func CreateCollection(resource driver.MongoResource) Collection {
 	return Collection{Blockchain: resource.DB.Collection("blockchains")}
 }
 
-func QueryBlockChain(collection Collection) ([]BlockChain, error) {
-	ctx, cancel := createContext()
-	var blocks []BlockChain
-	defer cancel()
-	cur, err := collection.Blockchain.Find(ctx, bson.M{})
-	if err != nil {
-		return []BlockChain{}, err
-	}
-	defer cur.Close(ctx)
+func QueryBlockChain(ctx context.Context) func(collection Collection) ([]BlockChain, error) {
+	return func(collection Collection) ([]BlockChain, error) {
+		var blocks []BlockChain
 
-	for cur.Next(ctx) {
-		var block BlockChain
-		var bsonBlock bson.M
-		if err = cur.Decode(&bsonBlock); err != nil {
-			return []BlockChain{}, err
-		}
-		bsonBytes, err := bson.Marshal(bsonBlock)
+		cur, err := collection.Blockchain.Find(ctx, bson.M{})
 		if err != nil {
 			return []BlockChain{}, err
 		}
-		err = bson.Unmarshal(bsonBytes, &block)
-		if err != nil {
-			return []BlockChain{}, err
+		defer cur.Close(ctx)
+
+		for cur.Next(ctx) {
+			var (
+				block     BlockChain
+				bsonBlock bson.M
+			)
+
+			if err = cur.Decode(&bsonBlock); err != nil {
+				return []BlockChain{}, err
+			}
+
+			bsonBytes, err := bson.Marshal(bsonBlock)
+			if err != nil {
+				return []BlockChain{}, err
+			}
+
+			if err := bson.Unmarshal(bsonBytes, &block); err != nil {
+				return []BlockChain{}, err
+			}
+			blocks = append(blocks, block)
 		}
-		blocks = append(blocks, block)
+		return blocks, nil
 	}
-	return blocks, nil
 }
 
 func QueryOneBlockChainByHash(hash string) func(collection Collection) (BlockChain, error) {

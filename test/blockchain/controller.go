@@ -20,9 +20,9 @@ func GetBlockChainByHashController(c *fiber.Ctx, repository Collection) error {
 	searchChain, err := GetBlockChainBy(QueryOneBlockChainByHash(c.Params("hash")))(repository)
 	if err != nil {
 		if errors.Is(err, ErrorNotFound) {
-			return c.SendStatus(404)
+			return c.SendStatus(fiber.StatusNotFound)
 		}
-		return c.SendStatus(400)
+		return c.SendStatus(fiber.StatusBadRequest)
 	}
 	return c.JSON(searchChain)
 }
@@ -53,14 +53,16 @@ func AddBlockChainController(c *fiber.Ctx, repository Collection) error {
 	if err != nil {
 		return c.SendStatus(400)
 	}
+
 	block := BlockChain{
 		Index: len(blocks),
 		Body:  reqBody.Body,
 	}
+
 	serviceParam := AddPrevHashInBlock(blocks, block)
 	newBlock := NewBlockByBody(serviceParam)
-	err = AppendBlockInDatabase(repository, newBlock)
-	if err != nil {
+
+	if err = AppendBlockInDatabase(repository, newBlock); err != nil {
 		return c.SendStatus(400)
 	}
 
@@ -72,9 +74,9 @@ func ValidateBlockChainController(c *fiber.Ctx, repository Collection) error {
 	if err != nil {
 		return c.SendStatus(400)
 	}
-	isBlockValidate := ValidateBlockChain(blocks)
 
+	isBlockValidate := ValidateBlockChain(blocks)
 	response := ValidateBlockChainResponse{IsValidate: isBlockValidate}
 
-	return c.JSON(response)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
