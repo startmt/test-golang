@@ -46,8 +46,8 @@ func QueryBlockChain(resource DefaultControllerResource) ([]BlockChain, error) {
 	return blocks, nil
 }
 
-func GetBlockChainOneBy(queryData bson.M) func(DefaultControllerResource) (BlockChain, error) {
-	return func(resource DefaultControllerResource) (BlockChain, error) {
+func GetBlockChainOneBy(resource DefaultControllerResource) func(bson.M) (BlockChain, error) {
+	return func(queryData bson.M) (BlockChain, error) {
 		cur := resource.Collection.Blockchain.FindOne(resource.Context, queryData)
 		var block BlockChain
 		err := cur.Decode(&block)

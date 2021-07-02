@@ -16,7 +16,7 @@ func GetBlockChainArrayController(resource DefaultControllerResource) ([]BlockCh
 }
 
 func GetBlockChainByHashController(resource DefaultControllerResource, hash string) (BlockChain, error) {
-	searchChain, err := GetBlockChainOneBy(bson.M{"hash": hash})(resource)
+	searchChain, err := GetBlockChainOneBy(resource)(bson.M{"hash": hash})
 
 	if err != nil {
 		return BlockChain{}, err
@@ -25,7 +25,7 @@ func GetBlockChainByHashController(resource DefaultControllerResource, hash stri
 }
 
 func GetBlockChainByIndexController(resource DefaultControllerResource, index int) (BlockChain, error) {
-	searchChain, err := GetBlockChainOneBy(bson.M{"index": index})(resource)
+	searchChain, err := GetBlockChainOneBy(resource)(bson.M{"index": index})
 
 	if err != nil {
 		return BlockChain{}, err
