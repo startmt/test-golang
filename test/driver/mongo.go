@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
+	. "github.com/startmt/test-golang/test/config"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -14,15 +15,8 @@ type MongoResource struct {
 	DB *mongo.Database
 }
 
-type Config struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	DBName   string `json:"db_name"`
-	Endpoint string `json:"endpoint"`
-}
-
 func ConnectMongo(ctx context.Context, conf Config) (MongoResource, error) {
-	mongoConnectString := fmt.Sprintf("mongodb://%s:%s@%s", conf.Username, conf.Password, conf.Endpoint)
+	mongoConnectString := fmt.Sprintf("mongodb://%s:%s@%s", conf.Mongo.Username, conf.Mongo.Password, conf.Mongo.Host)
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoConnectString))
 	if err != nil {
@@ -34,5 +28,5 @@ func ConnectMongo(ctx context.Context, conf Config) (MongoResource, error) {
 		return MongoResource{}, errors.Wrap(err, "pinging to mongodb")
 	}
 
-	return MongoResource{DB: client.Database(conf.DBName)}, nil
+	return MongoResource{DB: client.Database(conf.Mongo.DBName)}, nil
 }

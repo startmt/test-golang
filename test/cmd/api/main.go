@@ -26,12 +26,7 @@ func startServer() error {
 		return err
 	}
 
-	mongo, err := driver.ConnectMongo(context.Background(), driver.Config{
-		Username: conf.Mongo.Username,
-		Password: conf.Mongo.Password,
-		DBName:   conf.Mongo.DBName,
-		Endpoint: conf.Mongo.Host,
-	})
+	mongo, err := driver.ConnectMongo(context.Background(), conf)
 	if err != nil {
 		return err
 	}
